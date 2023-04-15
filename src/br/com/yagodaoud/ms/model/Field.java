@@ -47,8 +47,52 @@ public class Field {
         }
     }
 
+    public boolean isMined() {
+        return hasMine;
+    }
+
     public boolean isMarked(){
         return marked;
+    }
+
+     void setOpen(boolean open) {
+        this.open = open;
+    }
+
+    public boolean isOpen(){
+        return marked;
+    }
+
+    public boolean isClosed(){
+        return !isOpen();
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getColumn() {
+        return column;
+    }
+
+    boolean goalAchieved() {
+        boolean found = !hasMine && open;
+        boolean safe = hasMine && marked;
+        return found || safe;
+    }
+
+    long minesOnTheNeighborhood() {
+        return neighbors.stream().filter(n -> n.hasMine).count();
+    }
+
+    void restart() {
+        open = false;
+        hasMine = false;
+        marked = false;
+    }
+
+    void mine(){
+        hasMine = true;
     }
 
     boolean open() {
@@ -60,7 +104,7 @@ public class Field {
             }
 
             if (safeNeighbor()) {
-                neighbors.forEach(n -> n.open());
+                neighbors.forEach(Field::open);
             }
             return true;
         } else {
@@ -72,4 +116,18 @@ public class Field {
         return neighbors.stream().noneMatch(n -> n.hasMine);
     }
 
+    @Override
+    public String toString() {
+        if(marked) {
+            return "x";
+        } else if(open && hasMine) {
+            return "*";
+        } else if(open && minesOnTheNeighborhood() > 0) {
+            return Long.toString(minesOnTheNeighborhood());
+        } else if(open){
+            return " ";
+        } else {
+            return "?";
+        }
+    }
 }
